@@ -21,8 +21,10 @@ function data = PoPe_filterDat(subject, trial, prbsnumber)
     
     %fsNew = 200;
     NyqFreq = 2000/2;
-    fco = 80;
-    [B, A] = butter (4,fco/NyqFreq, 'low');
+    fco = 100;
+    [B, A] = butter (3,fco/NyqFreq, 'low');
+    [B2, A2] = butter (4,1/NyqFreq, 'high');
+    [B3, A3] = butter(4, [59 61]./NyqFreq, 'stop');
     %Band pass 
     %Eerst rectifying, cut off low pass 80 Hz
     prbs = load(prbsfile);
@@ -39,10 +41,23 @@ function data = PoPe_filterDat(subject, trial, prbsnumber)
     %w = resample(prbs.w,prbs.t.',fsNew);
 %     reData = resample(tempData,linspace(0,60, length(tempData)).',fsNew);
     %data(:,6) = filtfilt(B, A, abs(data(:,6)-mean(data(:,6))));
-    data(:,6) = filtfilt(B, A, data(:,6));
-    data(:,6) = abs(data(:,6)-mean(data(:,6)))*1000;
-    data(:,7) = filtfilt(B, A, data(:,7));
-    data(:,7) = abs(data(:,7)-mean(data(:,7)))*1000;
+    data(:,6) = filtfilt(B2, A2, data(:,6));
+    data(:,6) = abs(data(:,6)-mean(data(:,6)));
+    data(:,6) = filtfilt(B, A, data(:,6))*1000;
+    
+    %data(:,6) = filtfilt(B3, A3, data(:,6));
+  
+    %data(:,6) = normalize(data(:,6));
+    %data(:,6) = data(:,6)/max(data(:,6));
+    data(:,7) = filtfilt(B2, A2, data(:,7));
+    data(:,7) = abs(data(:,7)-mean(data(:,7)));
+    data(:,7) = filtfilt(B, A, data(:,7))*1000;
+    
+    %data(:,7) = filtfilt(B3, A3, data(:,7));
+    
+    %plot(data(:,7))
+    %data(:,7) = normalize(data(:,7));
+    %data(:,7) = data(:,7)/max(data(:,7));
     
     %data(:,7) = filtfilt(B, A, abs(data(:,7)-mean(data(:,7))));
     data(:,8) = prbs.w(1:end);
