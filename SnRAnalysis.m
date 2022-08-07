@@ -31,14 +31,18 @@ for i = 1: length(participants)
         %plot_topography(channels, double(snr), false, 'EEGChannels64TMSi.mat');
     end
     figure(99+i)
-    sgtitle(join(["Participant ", string(subjectNumber)], ''))
+    sgtitle(join(["SnR of Participant ", string(subjectNumber)], ''))
     subplot(311)
     plot_topography(channels, double(mean(snr2(1:8,:),1)), false, 'EEGChannels64TMSi.mat');
+    title('Relax')
     subplot(312)
     plot_topography(channels, double(mean(snr2(9:16,:),1)), false, 'EEGChannels64TMSi.mat');
+    title('Let go')
     subplot(313)
     plot_topography(channels, double(mean(snr2(17:24,:),1)), false, 'EEGChannels64TMSi.mat');
+    title('Resist')
 end
+
 function snr = snrcalc(x)
     xavg = mean(x, 3);
     variance = var(x,0, 3);
