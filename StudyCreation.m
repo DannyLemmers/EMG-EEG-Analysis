@@ -6,15 +6,18 @@ eeglab nogui;
 datafolders = "D:\ThesisData\Data\P*";
 participants = dir(datafolders);
 conditions = {'1. Long let go', '2. Let go', '3. Resist'};
+filenames = {'FiltIcaBrain65_'; 'FiltIcaBrain45_'; 'FiltIcaNoEye65_'; 'FiltIcaNoEye85_'; 'FiltNoIca_'};
+type = filenames(3);
+type = char(type);
 k = 1;
 for i = 1: length(participants)
     subjectNumber = str2double(participants(i).name(2:end));
     rawEEGPath = join(["D:\ThesisData\Data\P", subjectNumber, "\EEG\set_filt"], '');
-    sets = dir(fullfile(rawEEGPath, '*n.set'));
+    sets = dir(fullfile(rawEEGPath, join([type, '*.set'], '')));
     run = 1;
     for j = 1 : length(sets)
-        [STUDY, ALLEEG] = std_editset( STUDY, ALLEEG, 'name','Groupstudy', 'filename', 'GroupStudy','commands' , ...
-                {'index' k 'load' join([sets(j).folder, '\', sets(j).name], '') 'subject' mat2str(subjectNumber) 'condition' char(conditions(str2double(sets(j).name(end-6))))...
+        [STUDY, ALLEEG] = std_editset( STUDY, ALLEEG, 'name',type(1:end-1), 'filename', type(1:end-1),'commands' , ...
+                {'index' k 'load' join([sets(j).folder, '\', sets(j).name], '') 'subject' mat2str(subjectNumber) 'condition' char(conditions(str2double(sets(j).name(end-5))))...
                 'run' run 'session' 1},'updatedat','on', 'resave', 'on' );
 
 
@@ -31,5 +34,3 @@ for i = 1: length(participants)
 end
 CURRENTSET = length(ALLEEG);
 
-%%
-[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, 'channels','erp', 'on', 'erpparams', {'rmbase' [-250 500]} ); 

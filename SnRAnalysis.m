@@ -6,16 +6,17 @@ datafolders = "D:\ThesisData\Data\P*";
 participants = dir(datafolders);
 % dataFolder = 'D:\ThesisData\Data\P12\EEG\set_filt';
 % sets = dir(fullfile(dataFolder, '*.set'));
+highestSnrchan = [];
 fs = 2000;
 s50 = fs*50/1000;
 sm250 = fs*250/1000;
 load('EEGChannels64TMSi.mat');
-
-
+channelsAnalysed = ['FC5' 'FC3' 'FC1' 'FCZ' 'C5' 'C3' 'C1' 'CZ' 'CP5' 'CP3' 'CP1' 'CPZ' 'P5' 'P3' 'P1' 'PZ'];
+chanNums = [9 10 41 42 44 15 45 16 20 48 21 49 51 25 52 26];
 for i = 1: length(participants)
     subjectNumber = str2double(participants(i).name(2:end));
     rawEEGPath = join(["D:\ThesisData\Data\P", subjectNumber, "\EEG\set_filt"], '');
-    sets = dir(fullfile(rawEEGPath, '*.set'));
+    sets = dir(fullfile(rawEEGPath, join(['FiltIcaNoEye65_', '*.set'], '')));
     for j = 1 : length(sets)
         EEG = pop_loadset(sets(j).name, sets(j).folder);
         data = EEG.data(:,s50:end-sm250,:);    
@@ -25,24 +26,29 @@ for i = 1: length(participants)
         channels = upper(channels);
         index = find(ismember(channels, ["M1", "M2"]));%% || channels == "M2");
         channels(index) = [];
-        snr(index) = [];
+        %snr(index) = [];
         snr2(j,:) = snr;
+        [~, maxSnR] = max(snr);
+        highestSnrchan = [highestSnrchan; channels(maxSnR)];
+        disp(join(["Highest SNR at chan num: ", channels(maxSnR)], ''));
         %figure(i)
         %plot_topography(channels, double(snr), false, 'EEGChannels64TMSi.mat');
     end
     figure(99+i)
     sgtitle(join(["SnR of Participant ", string(subjectNumber)], ''))
-    subplot(311)
-    plot_topography(channels, double(mean(snr2(1:8,:),1)), false, 'EEGChannels64TMSi.mat');
+    subplot(131)
+    plot_topography(channels, double(mean(snr2(1:8,:),1)), false, 'newChanLocs.mat');
     title('Relax')
-    subplot(312)
-    plot_topography(channels, double(mean(snr2(9:16,:),1)), false, 'EEGChannels64TMSi.mat');
+    subplot(132)
+    plot_topography(channels, double(mean(snr2(9:16,:),1)), false, 'newChanLocs.mat');
     title('Let go')
-    subplot(313)
-    plot_topography(channels, double(mean(snr2(17:24,:),1)), false, 'EEGChannels64TMSi.mat');
+    subplot(133)
+    plot_topography(channels, double(mean(snr2(17:24,:),1)), false, 'newChanLocs.mat');
     title('Resist')
+    averageSNR(i) = mean(mean(snr2(:,chanNums)));
+    
 end
-
+avgSNR = mean(averageSNR)
 function snr = snrcalc(x)
     xavg = mean(x, 3);
     variance = var(x,0, 3);
@@ -131,6 +137,8 @@ function h = plot_topography(ch_list, values, make_contour, system, ...
         end
     else
         if length(values) ~= length(ch_list)
+            length(values)
+            length(ch_list)
             error('[plot_topography] values must have the same length as ch_list.');
         end
         idx = NaN(length(ch_list),1);

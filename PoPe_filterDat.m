@@ -1,18 +1,18 @@
 function data = PoPe_filterDat(subject, trial, prbsnumber)
     %%init
-    datafolders = "C:\Users\Danny\Documents\Thesis\Data\P*";
+    datafolders = "D:\ThesisData\Data\P*";
     participants = dir(datafolders);
     subjectNumber = str2double(participants(subject).name(2:end));
-    rawEMGPath = join(["C:\Users\Danny\Documents\Thesis\Data\P", subjectNumber, "\PoPe\raw\"], '');
+    rawEMGPath = join(["D:\ThesisData\Data\P", subjectNumber, "\PoPe\raw\"], '');
     matFiles = dir(fullfile(rawEMGPath, '*.mat'));
     matFiles = matFiles(2:end-1);
     if trial < 9
-        prbsfile = join(["C:\Users\Danny\Documents\Thesis\PRBS Signal\P_prbs_long_",string(prbsnumber) ,".mat"],'');
+        prbsfile = join(["D:\ThesisData\prbs\P_prbs_long_",string(prbsnumber) ,".mat"],'');
         
     elseif trial > 16
-        prbsfile = join(["C:\Users\Danny\Documents\Thesis\PRBS Signal\P_prbs_",string(prbsnumber) ,".mat"],'');
+        prbsfile = join(["D:\ThesisData\prbs\P_prbs_",string(prbsnumber) ,".mat"],'');
     else
-        prbsfile = join(["C:\Users\Danny\Documents\Thesis\PRBS Signal\P_prbs_",string(prbsnumber) ,".mat"],'');
+        prbsfile = join(["D:\ThesisData\prbs\P_prbs_",string(prbsnumber) ,".mat"],'');
     end
      %prbsfile = join(["C:\Users\Danny\Documents\Thesis\PRBS Signal\P_prbs_long_",string(1) ,".mat"],'');
     fileName = join([rawEMGPath, matFiles(trial).name], '');
@@ -21,10 +21,9 @@ function data = PoPe_filterDat(subject, trial, prbsnumber)
     
     %fsNew = 200;
     NyqFreq = 2000/2;
-    fco = 100;
+    fco = 120;
     [B, A] = butter (3,fco/NyqFreq, 'low');
     [B2, A2] = butter (4,1/NyqFreq, 'high');
-    [B3, A3] = butter(4, [59 61]./NyqFreq, 'stop');
     %Band pass 
     %Eerst rectifying, cut off low pass 80 Hz
     prbs = load(prbsfile);
